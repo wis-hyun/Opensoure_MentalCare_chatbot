@@ -19,7 +19,7 @@ def get_dataset():
 model = cached_model()
 df = get_dataset()
 
-st.header('눈송이 챗봇')
+st.header('눈송이 멘탈케어 챗봇')
 
 
 if 'generated' not in st.session_state:
@@ -29,7 +29,7 @@ if 'past' not in st.session_state:
     st.session_state['past'] = []
 
 with st.form('form', clear_on_submit=True):
-    user_input = st.text_input('당신: ', '')
+    user_input = st.text_input('눈송이: ', '')
     submitted = st.form_submit_button('전송')
 
 if submitted and user_input:
