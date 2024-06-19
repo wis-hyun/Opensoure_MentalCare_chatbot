@@ -29,6 +29,14 @@ model = cached_model()
 df = get_dataset()
 tokenizer, sentiment_model = get_sentiment_model()
 
+# 대화 요약 함수 정의
+def summarize_conversation(past, generated):
+    summary = ""
+    for i in range(len(past)):
+        summary += f"눈송이: {past[i]}\n"   # 사용자 입력 기록 추가
+        summary += f"챗봇: {generated[i]}\n\n"  # 챗봇 응답 요약
+    return summary
+
 st.header('❄️ 눈송이 챗봇 ❄️')
 
 if 'generated' not in st.session_state:
@@ -72,10 +80,16 @@ if submitted and user_input:
         response_time = time.time() - start_time
         st.success(f"응답 시간: {response_time:.2f}초")
 
+# 대화 로그 버튼 추가
+if st.button('대화 로그', key='summary_button'):
+    conversation_summary = summarize_conversation(st.session_state.past, st.session_state.generated)
+    st.text_area("대화 로그", value=conversation_summary, height=300)   # 대화 요약 결과를 출력할 텍스트 영역 추가
+
+# 대화 로그 출력
 for i in range(len(st.session_state['past'])):
-    message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')
+    message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')    # 사용자 입력 메시지 출력
     if len(st.session_state['generated']) > i:
-        message(st.session_state['generated'][i], key=str(i) + '_bot')
+        message(st.session_state['generated'][i], key=str(i) + '_bot')  # 챗봇 응답 메시지 출력
 
 st.markdown(
     f"""
