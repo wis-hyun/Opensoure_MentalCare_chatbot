@@ -1,19 +1,21 @@
-# ❄️ Opensoure_MentalCare_chatbot 
-숙명여자대학교 오픈소스프로그래밍 과목에서 구현한 '눈송이 멘탈케어 챗봇' 소스코드입니다. 저희 팀은 학교의 상징인 눈송이를 모티브로 눈송이 사용자들의 정신적인 부분을 케어해주는 전담 챗봇을 구현하였습니다. 
+# 심리상담 챗봇
 
-### ⏱️ 개발기간
-2024.05.15 ~ 2024.06.21
+심리상담 정신건강 상담 챗봇. AI chatbot for psychology consultation.
 
-## 🩵 기능 소개
-1. 대화기능(챗봇)
-2. 감정분석기능
-3. 대화 초기화 기능
-4. 응답시간 측정 기능
-5. 대화 요약 기능
-6. 
+![](result.png)
 
-### 🩵 개발자 소개
-김다솔
-이가은
-김연서
-김성현
+## Pretrained Model
+
+SentenceBERT [jhgan/ko-sroberta-multitask](https://huggingface.co/jhgan/ko-sroberta-multitask)
+
+## Dataset
+
+[웰니스 대화 스크립트 데이터셋](https://aihub.or.kr/opendata/keti-data/recognition-laguage/KETI-02-006)
+
+## Dependency
+
+- streamlit
+- streamlit-chat
+- pandas
+- sentence-transformers
+- scikit-learn
