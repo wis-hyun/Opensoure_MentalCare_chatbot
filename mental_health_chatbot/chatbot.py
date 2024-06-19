@@ -14,7 +14,7 @@ def cached_model():
 
 @st.cache_data
 def get_dataset():
-    df = pd.read_csv('/Users/sunghyunkim/Desktop/mental-health-chatbot/wellness_dataset.csv')
+    df = pd.read_csv('/Users/sunghyunkim/Desktop/mental_health_chatbot/wellness_dataset.csv')
     df['embedding'] = df['embedding'].apply(json.loads)
     return df
 
