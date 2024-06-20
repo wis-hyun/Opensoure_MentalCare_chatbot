@@ -7,6 +7,61 @@ import json
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
 import time
+from mental_health_chatbot.chatbot_logic import emergency_link
+import os
+import base64
+import tempfile
+
+CONFIG = {}
+DATASET_PATH = ""
+
+def load_config():
+    global CONFIG, DATASET_PATH
+    with open('config.json', 'r') as f:
+        CONFIG = json.load(f)
+    DATASET_PATH = CONFIG['dataset_path']
+
+load_config()
+
+
+# MP3 파일 경로 (Streamlit 앱 내부)
+audio_file_path = os.path.join(DATASET_PATH, 'thema.mp3')
+audio_file = open(audio_file_path, "rb")
+
+# 오디오 플레이어 위젯 생성
+st.markdown(
+    """
+    <div style="text-align: center; margin-bottom: 10px;">
+        <p style="font-size: 18px; color: black;">"이 플레이어로 편안한 마음을 드릴게요🍀"</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+st.audio(audio_file.read(), format="audio/mp3")
+
+
+
+def add_bg_from_local(image_file):
+    with open(image_file, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read())
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url(data:image/{"png"};base64,{encoded_string.decode()});
+            background-size: 67%; /* Adjust the percentage as needed */
+            background-position: south; /* Optional: south the image */
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# 배경 이미지 추가
+img_file_path = os.path.join(DATASET_PATH, 'home.png')
+add_bg_from_local(img_file_path)  # 이미지 파일 이름을 정확히 입력
 
 @st.cache_resource
 def cached_model():
@@ -15,7 +70,8 @@ def cached_model():
 
 @st.cache_data
 def get_dataset():
-    df = pd.read_csv('/Users/sunghyunkim/Desktop/mental-health-chatbot/wellness_dataset.csv')
+    csv_file_path = os.path.join(DATASET_PATH,'mental_health_chatbot','wellness_dataset.csv')
+    df = pd.read_csv(csv_file_path)
     df['embedding'] = df['embedding'].apply(json.loads)
     return df
 
@@ -38,6 +94,19 @@ def summarize_conversation(past, generated):
     return summary
 
 st.header('❄️ 눈송이 챗봇 ❄️')
+st.markdown("[❤️하이브리드샘이솟아](https://github.com/wis-hyun/Opensoure_MentalCare_chatbot)")
+st.markdown(
+    f"""
+    <style>
+    [data-testid="stForm"] {{
+        background-color: lightblue;
+        padding: 20px;
+        border-radius: 10px;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 if 'generated' not in st.session_state:
     st.session_state['generated'] = []
@@ -58,23 +127,29 @@ with st.form('form', clear_on_submit=True):
 if submitted and user_input:
     with st.spinner('처리 중...'):
         start_time = time.time()
-        embedding = model.encode(user_input)
-        df['distance'] = df['embedding'].map(lambda x: cosine_similarity([embedding], [x]).squeeze())
-        answer = df.loc[df['distance'].idxmax()]
 
-        # 감정 분석
-        inputs = tokenizer(user_input, return_tensors="pt", truncation=True, padding=True)
-        outputs = sentiment_model(**inputs)
-        sentiment_score = torch.nn.functional.softmax(outputs.logits, dim=1)
-        sentiment_label_idx = torch.argmax(sentiment_score, dim=1).item()
-
-        if sentiment_label_idx == 0:
+        if '자살' in user_input:
+            answer = emergency_link()
             sentiment_label = "부정적 😢"
-        elif sentiment_label_idx == 1:
-            sentiment_label = "중립적 😐"
         else:
-            sentiment_label = "긍정적 😊"
+            embedding = model.encode(user_input)
+            df['distance'] = df['embedding'].map(lambda x: cosine_similarity([embedding], [x]).squeeze())
+            answer = df.loc[df['distance'].idxmax()]
 
+            # 감정 분석
+            inputs = tokenizer(user_input, return_tensors="pt", truncation=True, padding=True)
+            outputs = sentiment_model(**inputs)
+            sentiment_score = torch.nn.functional.softmax(outputs.logits, dim=1)
+            sentiment_label_idx = torch.argmax(sentiment_score, dim=1).item()
+
+            if sentiment_label_idx == 0:
+                sentiment_label = "부정적 😢"
+            elif sentiment_label_idx == 1:
+                sentiment_label = "중립적 😐"
+            else:
+                sentiment_label = "긍정적 😊"
+
+        print(answer)
         st.session_state.past.append(f"{user_input} (감정: {sentiment_label})")
         st.session_state.generated.append(answer['챗봇'])
         response_time = time.time() - start_time
