@@ -276,7 +276,7 @@ with col4:
     st.button('대화 로그', on_click=summary_button)
 
 with col5:
-    st.button('대화 로그 저장', on_click=summary_save)
+    st.button('대화로그 저장', on_click=summary_save)
 
 if st.session_state.conversation_summary:
     st.text_area("대화 로그", value=st.session_state.conversation_summary, height=300)
