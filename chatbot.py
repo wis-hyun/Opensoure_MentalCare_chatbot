@@ -136,7 +136,6 @@ if 'questions' not in st.session_state:
 
 
 def reset_session():
-    print("초기화")
     st.session_state['questions'] = []
     st.session_state['generated'] = []
     st.session_state['past'] = []
@@ -147,24 +146,15 @@ def reset_session():
     st.session_state['survey_end'] = False
 
 def test(test_type):
-    print(test_type)
     st.session_state['survey_mode'] = True
     st.session_state['survey_end'] = False
     st.session_state['survey_type'] = test_type
 
 with st.form('form', clear_on_submit=True):
-    # if(st.session_state['survey_end'] == True):
-    #     print("끝?")
-    #     reset_session()
-    print("인풋")
     user_input = st.text_input('사용자 눈송이 🩵 : ', '')
     submitted = st.form_submit_button('전송하기')
-    print(user_input)
 
 if st.session_state['survey_mode']:
-    print("랭스22")
-    print(len(st.session_state['questions']))
-    print(st.session_state['survey_mode'])
     if st.session_state['survey_type'] == 'depression':
         st.session_state['questions'] = [
             "기분이 가라앉거나, 우울하거나, 희망이 없다고 느꼈다.\n&emsp;&emsp;&emsp;(1:없음, 2:거의 없음, 3:많음, 4:매우 많음)",
@@ -181,14 +171,11 @@ if st.session_state['survey_mode']:
             "최근 1개월 동안, 당신의 개인적 문제들을 다루는데 있어서 얼마나 자주 자신감을 느끼셨습니까?\n&emsp;&emsp;&emsp;&emsp;&emsp;(1:없음, 2:거의 없음, 3:많음, 4:매우 많음)"
         ]
 
-    print("랭스")
-    print(len(st.session_state['questions']))
     if (st.session_state['survey_idx'] < len(st.session_state['questions'])):
         st.session_state.generated.append(st.session_state['questions'][st.session_state['survey_idx']])
         st.session_state['survey_idx'] += 1
 
 if submitted and user_input:
-    print("submiited")
     with st.spinner('처리 중...'):
         start_time = time.time()
 
@@ -296,14 +283,11 @@ if st.session_state.conversation_summary:
 
 # 대화 로그 출력
 if (st.session_state['survey_mode']):
-    print("서베이")
     for i in range(len(st.session_state['generated'])):
         message(st.session_state['generated'][i], key=str(i) + '_bot2')  # 챗봇 응답 메시지 출력
         if len(st.session_state['past']) > i:
             message(st.session_state['past'][i], is_user=True, key=str(i) + '_user2')  # 사용자 입력 메시지 출력
 
-    print("questions")
-    print(len(st.session_state['questions']))
     if len(st.session_state['questions']) != 0 and st.session_state['survey_idx'] == len(st.session_state['questions']):
         sum = 0
         for i in range(len(st.session_state['past'])):
@@ -331,7 +315,6 @@ if (st.session_state['survey_mode']):
         message(result, key=str('result') + '_result_bot')  # 챗봇 응답 메시지 출력
 else:
     for i in range(len(st.session_state['past'])):
-        print("노서베이")
         message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')  # 사용자 입력 메시지 출력
         if len(st.session_state['generated']) > i:
             message(st.session_state['generated'][i], key=str(i) + '_bot')  # 챗봇 응답 메시지 출력
