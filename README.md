@@ -102,6 +102,6 @@ Opensoure_MentalCare_chatbot/
 
 > 애플리케이션 실행 화면 예시입니다:
 
-![메인 화면](a/main.jpg)  
+![메인 화면](a/main.png)  
 
 ---
